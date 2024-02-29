@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+
+
+model User {
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  first_name   String
+  last_name    String
+  profil_photo String?
+  role         String           @default("user")
+  creted_at    DateTime       @default(now())
+  following    Follow[]       @relation("followingUser")
+  followed     Follow[]       @relation("followedUser")
+  post         Post[]
+  like         Like[]
+  commentaire  Commentaire[]
+  conversation Conversation[]
+  receive_user Message[]
+}
+
+model Follow {
+  id                Int      @id @default(autoincrement())
+  following_user_id Int
+  followed_user_id  Int
+  created_at        DateTime @default(now())
+  following_user    User     @relation("followingUser", fields: [following_user_id], references: [id])
+  followed_user     User     @relation("followedUser", fields: [followed_user_id], references: [id])
+}
+
+model Post {
+  id          Int           @id @default(autoincrement())
+  titre       Int
+  body        String
+  user_id     Int
+  user        User          @relation(fields: [user_id], references: [id])
+  created_at  DateTime      @default(now())
+  like        Like[]
+  commentaire Commentaire[]
+}
+
+model Like {
+  id      Int     @id @default(autoincrement())
+  status  Boolean @default(false)
+  user_id Int
+  post_id Int
+  user    User    @relation(fields: [user_id], references: [id])
+  post    Post    @relation(fields: [post_id], references: [id])
+}
+
+model Commentaire {
+  id      Int    @id @default(autoincrement())
+  body    String
+  user_id Int
+  post_id Int
+  user    User   @relation(fields: [user_id], references: [id])
+  post    Post   @relation(fields: [post_id], references: [id])
+}
+
+model Conversation {
+  id              Int       @id @default(autoincrement())
+  user_id         Int       @unique
+  user            User      @relation(fields: [user_id], references: [id])
+  created_at      DateTime  @default(now())
+  created_message Message?  @relation("MessageConversation")
+  message         Message[]
+}
+
+model Message {
+  id              Int          @id @default(autoincrement())
+  body            String
+  created_user_id Int          @unique
+  created_user    Conversation @relation("MessageConversation", fields: [created_user_id], references: [user_id])
+  receive_user_id Int
+  receive_user    User         @relation(fields: [receive_user_id], references: [id])
+  conversation_id Int
+  conversation    Conversation @relation(fields: [conversation_id], references: [id])
+  created_at      DateTime     @default(now())
+}
