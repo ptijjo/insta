@@ -11,7 +11,7 @@ export class UserRoute implements Route{
 
     constructor(){
         this.router
-            .post(`${this.path}`,) //Creation d'un nouvel utilisateur
+            .post(`${this.path}`,this.userCtrl.createUser) //Creation d'un nouvel utilisateur
             .post(`${this.path}/connection`,) // Connection d'un utilisateur
             .put(`${this.path}/:id`,) //Modification des données utilisateur
             //.delete(`${this.path}/:id`,auth,this.userCtrl.deleteUser) //Supression utilisateur

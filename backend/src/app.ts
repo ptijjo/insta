@@ -5,6 +5,8 @@ import morgan from "morgan";
 import "dotenv/config";
 import { Route } from "./routes";
 import { Server } from "socket.io";
+import helmet from "helmet";
+import hpp from "hpp";
 
 export class App{
 
@@ -26,7 +28,7 @@ export class App{
         this.listen();
         this.initilizeServer();
         this.initializeRoutes(routes);
-        this.initializeSocket();
+        //this.initializeSocket();
         this.getSocket();
 
     }
@@ -41,9 +43,13 @@ export class App{
     //Méthode qui initialise notre serveur
     private initilizeServer():void{
         this.app
-        .use(cors())
+        .use(cors({ origin: "*", credentials: true,  "optionsSuccessStatus": 204 }))
         .use(morgan("dev"))
         .use(express.json())
+        .use(express.urlencoded({ extended: true }))
+        .use(hpp())
+        .use(helmet())
+
     };
 
    
@@ -69,8 +75,9 @@ export class App{
     };
 
     //Méthode pour pouvoir utiliser le socket partout
-    private getSocket() {
+    public getSocket() {
         return this.io;
     }
     
 }
+
